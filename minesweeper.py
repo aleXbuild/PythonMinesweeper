@@ -1,26 +1,16 @@
 import random
+import os
 
 class Minefield():
-    # @property
-    # def field(self):
-    #     return self._field
-    
-    # @field.setter
-    # def field(self, value):
-    #     if not (isinstance(value, list) and all(isinstance(self._rows, list) for self._rows in value)):
-    #         raise TypeError("Minefield must be a two-dimentional list!")
-    #     else:
-    #         self._field = value
-
     def __init__(self, rows, cols):
         self._rows = rows
         self._cols = cols
         self._field = [[0 for _ in range(cols)] for _ in range(rows)]
 
-    def get_grid_value(self, row, col):
+    def get_tile_value(self, row, col):
         return self._field[row][col]
     
-    def change_grid_value(self, row, col, value :int):
+    def change_tile_value(self, row, col, value :int):
         self._field[row][col] = value
 
 class Game:
@@ -52,7 +42,7 @@ class Game:
         self.size_limit = size_limit
         self._debug_mode = debug_mode
 
-        self.player = PlayerInput()
+        self.player = Player()
         self.size = self.player.request_grid_size()
 
         self._field = Minefield(self.size, self.size)
@@ -63,10 +53,17 @@ class Game:
         self.generator.generate_numbers()
 
         self.ui = UI(self.size, self._player_view, self._debug_mode, self._field)
-        self.ui.render()
 
-    def render(self):
+        while not self.player.is_dead:
+            self.ui.render_ui()
+            self.player.render_ui()
+
+    def render_ui(self):
         pass
+
+    def update(self):
+        if self._field.get_tile_value(self.player.get_row_selection(), self.player.get_col_selection) == -1:
+
 
 class Generator(Game):
     def __init__(self, size, field):
@@ -79,19 +76,19 @@ class Generator(Game):
             row = random.randint(0, self._size-1)
             col = random.randint(0, self._size-1)
 
-            if (self._field.get_grid_value(row, col) != -1):
-                self._field.change_grid_value(row, col, -1)
+            if (self._field.get_tile_value(row, col) != -1):
+                self._field.change_tile_value(row, col, -1)
                 k += 1
 
     def __add_number(self, row, col):
-        if (self._field.get_grid_value(row, col) != -1):
-            grid_num = self._field.get_grid_value(row, col) + 1  
-            self._field.change_grid_value(row, col, grid_num)
+        if (self._field.get_tile_value(row, col) != -1):
+            grid_num = self._field.get_tile_value(row, col) + 1  
+            self._field.change_tile_value(row, col, grid_num)
 
     def generate_numbers(self):
         for row in range(self._size):
             for col in range(self._size):
-                if self._field.get_grid_value(row, col) == -1:
+                if self._field.get_tile_value(row, col) == -1:
                     gen_row = row
                     gen_col = col
 
@@ -133,15 +130,27 @@ class Generator(Game):
                         self.__add_number(gen_row, gen_col)
 
 
-class PlayerInput(Game):
-    def __init__(self):
-        pass
+class Player(Game):
+    def __init__(self, field):
+        self._field = field
+
+        self._selected_row = 0
+        self._selected_col = 0
+        self._is_flag = False
+        self.is_dead = False
 
     def request_grid_size(self):
         return int(input("Grid size: "))
 
-    def render(self):
-        pass
+    def render_ui(self):
+        self._selected_row, self._selected_row = map(int, input("Select row and column (space-separated): ").split())
+
+    def get_row_selection(self):
+        return self._selected_row
+    
+    def get_col_selection(self):
+        return self._selected_col
+
 
 class UI(Game):
     def __init__(self, size, player_view, debug_mode, field=[]):
@@ -154,7 +163,7 @@ class UI(Game):
         elif self._debug_mode and field==[]:
             raise AttributeError("Debug mode is enabled but minefield was not provided to the UI")
     
-    def render(self):
+    def render_ui(self):
         print()
         st = "   "
         for i in range(self._size):
@@ -179,7 +188,7 @@ class UI(Game):
                 if not self._debug_mode:
                     grid = self._player_view[row][col]
                 else:
-                    grid = self._field.get_grid_value(row, col)
+                    grid = self._field.get_tile_value(row, col)
                 
                 st = st + "|  " + str(grid) + "  "
             print(st + "|")
@@ -193,4 +202,4 @@ class UI(Game):
 
 
 print("MINESWEEPER\n")
-game = Game(8, True)
+game = Game(8, False)
