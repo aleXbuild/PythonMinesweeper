@@ -1,7 +1,7 @@
 import random
 
 class Minefield():
-    @property
+    # @property
     # def field(self):
     #     return self._field
     
@@ -25,36 +25,50 @@ class Minefield():
 
 class Game:
     @property
+    def size_limit(self):
+        return self._size_limit
+    
+    @size_limit.setter
+    def size_limit(self, value):
+        if value < 2:
+            raise ValueError("Size limit was set too low")
+        else:
+            self._size_limit = value
+
+    @property
     def size(self):
         return self._size
     
     @size.setter
     def size(self, value :int):
         if value < 2:
-            return 0
+            self._size = 0
+        elif value > self.size_limit:
+            self._size = 0
         else:
-            return value
+            self._size = value
 
-    @property
-    def size_limit(self):
-        return self._size_limit
-
-    def __init__(self, size_limit, is_debug_mode=False):
+    def __init__(self, size_limit, debug_mode=False):
         self.size_limit = size_limit
-        self._field = Minefield(self._size, self._size)
-        if is_debug_mode:
-            self._player_view = self._field
-        else:
-            self._player_view = [[['#' for _ in range(self._size)] for _ in range(self._size)]]
+        self._debug_mode = debug_mode
 
-        self.ui = UI(self._player_view)
-        self.generator = Generator(self.size, self._field, self.size)
+        self.player = PlayerInput()
+        self.size = self.player.request_grid_size()
+
+        self._field = Minefield(self.size, self.size)
+        self._player_view = [['#' for _ in range(self.size)] for _ in range(self.size)]
+
+        self.generator = Generator(self.size, self._field)
+        self.generator.generate_mines(self.size)
+
+        self.ui = UI(self.size, self._player_view, self._debug_mode, self._field)
+        self.ui.render()
 
     def render(self):
         pass
 
 class Generator(Game):
-    def __init__(self, size, field, mine_count):
+    def __init__(self, size, field):
         self._size = size
         self._field = field
     
@@ -68,15 +82,26 @@ class Generator(Game):
                 self._field.change_grid_value(row, col, -1)
                 k += 1
 
-
-
 class PlayerInput(Game):
     def __init__(self):
-        super.size = int(input("Grid size: "))
+        pass
+
+    def request_grid_size(self):
+        return int(input("Grid size: "))
+
+    def render(self):
+        pass
 
 class UI(Game):
-    def __init__(self, player_view):
+    def __init__(self, size, player_view, debug_mode, field=[]):
+        self._size = size
         self._player_view = player_view
+        self._debug_mode = debug_mode
+
+        if self._debug_mode and field!=[]:
+            self._field = field
+        elif self._debug_mode and field==[]:
+            raise AttributeError("Debug mode is enabled but minefield was not provided to the UI")
     
     def render(self):
         print()
@@ -99,7 +124,13 @@ class UI(Game):
 
             st = "  " + str(row + 1) + "  "
             for col in range(self._size):
-                st = st + "|  " + str(self._player_view[row][col]) + "  "
+                grid = ''
+                if not self._debug_mode:
+                    grid = self._player_view[row][col]
+                else:
+                    grid = self._field.get_grid_value(row, col)
+                
+                st = st + "|  " + str(grid) + "  "
             print(st + "|")
 
             st = "     "
@@ -111,4 +142,4 @@ class UI(Game):
 
 
 print("MINESWEEPER\n")
-game = Game()
+game = Game(8, False)
