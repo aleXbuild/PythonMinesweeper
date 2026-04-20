@@ -60,6 +60,7 @@ class Game:
 
         self.generator = Generator(self.size, self._field)
         self.generator.generate_mines(self.size)
+        self.generator.generate_numbers()
 
         self.ui = UI(self.size, self._player_view, self._debug_mode, self._field)
         self.ui.render()
@@ -83,38 +84,54 @@ class Generator(Game):
                 k += 1
 
     def __add_number(self, row, col):
-        grid_num = self._field.get_grid.value(row, col) + 1
-        self._field.change_grid_value(row, col, grid_num)
+        if (self._field.get_grid_value(row, col) != -1):
+            grid_num = self._field.get_grid_value(row, col) + 1  
+            self._field.change_grid_value(row, col, grid_num)
 
     def generate_numbers(self):
         for row in range(self._size):
             for col in range(self._size):
-                if self._field.get_grid.value(row, col) == -1:
+                if self._field.get_grid_value(row, col) == -1:
                     gen_row = row
                     gen_col = col
 
                     if gen_row - 1 >= 0:
                         gen_row -= 1
-                        grid_num = self._field.get_grid.value(gen_row, gen_col) + 1
-                        self._field.change_grid_value(gen_row, gen_col, grid_num)
+                        self.__add_number(gen_row, gen_col)
 
                         if gen_col -1 >= 0:
                             gen_col -= 1
-                            grid_num = self._field.get_grid.value(gen_row, gen_col) + 1
-                            self._field.change_grid_value(gen_row, gen_col, grid_num)
+                            self.__add_number(gen_row, gen_col)
+
+                        gen_col = col
+                        if gen_col + 1 < self._size:
+                            gen_col += 1
+                            self.__add_number(gen_row, gen_col)
 
                     gen_row = row
-                    gen_col = col
-
-                    if gen_row + 1 > self._size - 1:
+                    if gen_row + 1 < self._size:
                         gen_row += 1
-                        grid_num = self._field.get_grid.value(row, col) + 1
-                        self._field.change_grid_value(gen_row, gen_col, grid_num)
+                        self.__add_number(gen_row, gen_col)
 
-                        if gen_col + 1 > self._size - 1:
+                        if gen_col -1 >= 0:
+                            gen_col -= 1
+                            self.__add_number(gen_row, gen_col)
+
+                        gen_col = col
+                        if gen_col + 1 < self._size:
                             gen_col += 1
-                            grid_num = self._field.get_grid.value(gen_row, gen_col) + 1
-                            self._field.change_grid_value(gen_row, gen_col, grid_num)
+                            self.__add_number(gen_row, gen_col)
+
+                    gen_row = row
+                    if gen_col -1 >= 0:
+                        gen_col -= 1
+                        self.__add_number(gen_row, gen_col)
+
+                    gen_col = col
+                    if gen_col + 1 < self._size:
+                        gen_col += 1
+                        self.__add_number(gen_row, gen_col)
+
 
 class PlayerInput(Game):
     def __init__(self):
