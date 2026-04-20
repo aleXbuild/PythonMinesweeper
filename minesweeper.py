@@ -82,6 +82,40 @@ class Generator(Game):
                 self._field.change_grid_value(row, col, -1)
                 k += 1
 
+    def __add_number(self, row, col):
+        grid_num = self._field.get_grid.value(row, col) + 1
+        self._field.change_grid_value(row, col, grid_num)
+
+    def generate_numbers(self):
+        for row in range(self._size):
+            for col in range(self._size):
+                if self._field.get_grid.value(row, col) == -1:
+                    gen_row = row
+                    gen_col = col
+
+                    if gen_row - 1 >= 0:
+                        gen_row -= 1
+                        grid_num = self._field.get_grid.value(gen_row, gen_col) + 1
+                        self._field.change_grid_value(gen_row, gen_col, grid_num)
+
+                        if gen_col -1 >= 0:
+                            gen_col -= 1
+                            grid_num = self._field.get_grid.value(gen_row, gen_col) + 1
+                            self._field.change_grid_value(gen_row, gen_col, grid_num)
+
+                    gen_row = row
+                    gen_col = col
+
+                    if gen_row + 1 > self._size - 1:
+                        gen_row += 1
+                        grid_num = self._field.get_grid.value(row, col) + 1
+                        self._field.change_grid_value(gen_row, gen_col, grid_num)
+
+                        if gen_col + 1 > self._size - 1:
+                            gen_col += 1
+                            grid_num = self._field.get_grid.value(gen_row, gen_col) + 1
+                            self._field.change_grid_value(gen_row, gen_col, grid_num)
+
 class PlayerInput(Game):
     def __init__(self):
         pass
@@ -142,4 +176,4 @@ class UI(Game):
 
 
 print("MINESWEEPER\n")
-game = Game(8, False)
+game = Game(8, True)
