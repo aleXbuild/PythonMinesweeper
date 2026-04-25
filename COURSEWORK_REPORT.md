@@ -1,22 +1,27 @@
 # COURSEWORK REPORT
 
-## Introduction
-This coursework report covers the analysis and implementation of a Minesweeper game using Python. The project was aimed at enhancing programming skills, understanding algorithms, and developing a user-friendly interface.
+## 1. Introduction
+### What is the App
+The Minesweeper game is a classic puzzle game that challenges players to clear a minefield while avoiding hidden mines. The objective is to uncover all the squares without triggering any mines. This particular implementation is designed to run in Python, utilizing a console interface.
 
-## Body/Analysis
-### Design Considerations
-- **Game Rules**: Understanding the standard rules of Minesweeper was essential for implementation.
-- **Algorithm**: The main algorithm utilized was the backtracking method combined with a random placement of mines.
-- **User Interface**: A simple terminal-based interface was designed to avoid complexities associated with graphical libraries.
+### How to Run
+To run the app, ensure you have Python 3 installed. Clone the repository and navigate to the project directory. Use the command `python main.py` to start the game.
 
-### Implementation Details
-- **Classes and Functions**: The project was structured using OOP principles, defining classes for the game board, mines, and player interactions.
-- **Testing**: Unit tests were written to ensure the functionality of different components of the game.
+### How to Use
+Once the game starts, you will see a grid represented in the console. You can uncover a square by inputting its coordinates (e.g., `A1`). If you uncover a mine, the game ends. The goal is to uncover all squares that do not contain mines.
 
-## Results and Summary
-The final implementation allows players to interact with the game smoothly, revealing squares and flagging mines. The game has been tested for bugs and performs as expected. Feedback from users has been positive, indicating that the project met its objectives.
+## 2. Body/Analysis
+### Functional Requirements Implementation
+- **Grid Generation:** The game generates a grid of specified dimensions and places a set number of mines within it. This is done using random placement algorithms to ensure that the mines are distributed evenly.
+- **User Input Handling:** The application takes input from users in the form of grid coordinates, validating these inputs to prevent errors.
+- **Game Logic:** The core logic checks for mines and counts adjacent mines for each square. It uses depth-first search to reveal squares until all safe squares are uncovered.
 
-## Appendices
-- **Code Listings**: Complete code for the Minesweeper.
-- **User Manual**: A guide explaining how to play Minesweeper.
-- **Test Results**: Documentation of all tests conducted with their respective outcomes.
+## 3. Results and Summary
+### Results
+The implementation successfully meets all functional requirements. The game operates as intended, with responsive controls and accurate mine placements.
+
+### Conclusions
+Through this project, I have deepened my understanding of game logic and user interaction in Python. The structure of the code allows for easy modifications and improvements in future iterations.
+
+### Extension Possibilities
+Future developments could include adding a graphical user interface, difficulty settings (varying grid size and mine count), and multiplayer options.
