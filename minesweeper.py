@@ -1,5 +1,14 @@
-import random, os, subprocess, time
+import random
+import os
+import subprocess
+import time
 from datetime import date
+
+
+# This uses MVC (Model-View-Controller) design pattern
+
+# Minefield - a class that contains a minefield
+# In MVC acts as a Model
 
 class Minefield():
     def __init__(self, rows, cols):
@@ -9,9 +18,13 @@ class Minefield():
 
     def get_tile_value(self, row, col):
         return self._field[row][col]
-    
-    def change_tile_value(self, row, col, value :int):
+
+    def change_tile_value(self, row, col, value: int):
         self._field[row][col] = value
+
+
+# Game - the main class. Manages different elements of the game (UI for example)
+# Therefore this class acts as a Controller
 
 class Game:
     @property
@@ -21,7 +34,7 @@ class Game:
     @property
     def size_limit(self):
         return self._size_limit
-    
+
     @size_limit.setter
     def size_limit(self, value):
         if value < self.MIN_SIZE:
@@ -32,7 +45,7 @@ class Game:
     @property
     def size(self):
         return self._size
-    
+
     @size.setter
     def size(self, value :int):
         if value < self.MIN_SIZE and value != -1:
@@ -65,13 +78,15 @@ class Game:
             self._file.read_file()
 
         self._field = Minefield(self.size, self.size)
-        self._player_view = [['#' for _ in range(self.size)] for _ in range(self.size)]
+        self._player_view = [
+            ['#' for _ in range(self.size)] for _ in range(self.size)]
 
         self._generator = Generator(self.size, self._field, self._debug_mode)
         self._generator.generate_mines(self.size)
         self._generator.generate_numbers()
 
-        self.ui = UI(self.size, self.player_view, self._debug_mode, self._field)
+        self.ui = UI(self.size, self.player_view,
+                     self._debug_mode, self._field)
         self.render_ui
 
         self._start_time = time.time()
@@ -88,7 +103,7 @@ class Game:
             self.flag_count += 1
 
         self.ui.clear()
-    
+
     def check_tile(self, row, col):
         if self._field.get_tile_value(row, col) == -1:
             self.game_over()
@@ -100,14 +115,16 @@ class Game:
         match_count = 0
         for row in range(self.size):
             for col in range(self.size):
-                if self._field.get_tile_value(row, col) == -1 and self.player_view[row][col] == 'F':
+                if (self._field.get_tile_value(row, col) == -1 and
+                        self.player_view[row][col] == 'F'):
                     match_count += 1
 
         if match_count == mine_count:
             self.victory()
 
     def __ask_to_save(self):
-        prompt = input("Would you like to save this session in a file? (y/n): ")
+        prompt = input(
+            "Would you like to save this session in a file? (y/n): ")
         if prompt == "y" or prompt == "Y":
             self._file.save_game()
 
@@ -121,8 +138,9 @@ class Game:
         for row in range(self.size):
             for col in range(self.size):
                 if self._field.get_tile_value(row, col) != -1:
-                    self.player_view[row][col] = self._field.get_tile_value(row, col)
-        
+                    self.player_view[row][col] = self._field.get_tile_value(
+                        row, col)
+
         self.ui.render_ui()
         self.__ask_to_save()
 
@@ -135,18 +153,22 @@ class Game:
 
         for row in range(self.size):
             for col in range(self.size):
-                if self._field.get_tile_value(row, col) == -1 and self.player_view[row][col] != 'F':
+                if (self._field.get_tile_value(row, col) == -1 and
+                        self.player_view[row][col] != 'F'):
                     self.player_view[row][col] = 'M'
-        
+
         self.ui.render_ui()
         self.__ask_to_save()
+
+
+# Generator - places mines and numbers around them.
 
 class Generator():
     def __init__(self, size, field, debug_mode):
         self._size = size
         self._field = field
         self._debug_mode = debug_mode
-    
+
     def generate_mines(self, mine_count):
         k = 0
         while k < mine_count:
@@ -159,7 +181,7 @@ class Generator():
 
     def __add_number(self, row, col):
         if self._field.get_tile_value(row, col) != -1:
-            grid_num = self._field.get_tile_value(row, col) + 1  
+            grid_num = self._field.get_tile_value(row, col) + 1
             self._field.change_tile_value(row, col, grid_num)
             if self._debug_mode:
                 print(f"Incremented ({row}, {col}) to {grid_num}")
@@ -174,10 +196,10 @@ class Generator():
                         gen_row -= 1
                         self.__add_number(gen_row, gen_col)
 
-                        if gen_col -1 >= 0:
+                        if gen_col - 1 >= 0:
                             gen_col -= 1
                             self.__add_number(gen_row, gen_col)
-                        
+
                         gen_col = col
                         if gen_col + 1 < self._size:
                             gen_col += 1
@@ -211,6 +233,8 @@ class Generator():
                         self.__add_number(gen_row, gen_col)
 
 
+# Player - class that manages a player input, which makes it an another Controller
+
 class Player(Game):
     def __init__(self, game):
         self._game = game
@@ -218,23 +242,33 @@ class Player(Game):
         self._selected_col = 0
 
     def request_grid_size(self):
-        return int(input(f"Grid size (Range: {self._game.MIN_SIZE} - {self._game.size_limit}): "))
+        min_size = self._game.MIN_SIZE
+        max_size = self._game.size_limit
+        prompt = f"Grid size (Range: {min_size} - {max_size}): "
+        return int(input(prompt))
 
     def render_ui(self):
         try:
-            parts = input("Select row and column (space-separated): ").split()
-            self._selected_row, self._selected_col = int(parts[0]), int(parts[1])
+            msg = "Select row and column: "
+            parts = input(msg).split()
+            self._selected_row, self._selected_col = int(
+                parts[0]), int(parts[1])
             flag = parts[2] if len(parts) > 2 else ''
         except (IndexError, ValueError):
-            game.ui.clear()
+            self._game.ui.clear()
             return
 
-        if (self._selected_row > 0 and self._selected_col > 0 
-        and self._selected_row <= self._game.size and self._selected_col <= self._game.size):
+        row = self._selected_row
+        col = self._selected_col
+        size = self._game.size
+        if row > 0 and col > 0 and row <= size and col <= size:
             if flag == 'F' or flag == 'f':
-                self._game.flag_tile(self._selected_row-1, self._selected_col-1)
+                self._game.flag_tile(row - 1, col - 1)
             elif not flag or flag == '':
-                self._game.check_tile(self._selected_row-1, self._selected_col-1)
+                self._game.check_tile(row - 1, col - 1)
+
+
+# UI - used to display the minefield, which makes it a View in MVC design pattern
 
 class UI(Game):
     def __init__(self, size, player_view, debug_mode, field=[]):
@@ -242,11 +276,12 @@ class UI(Game):
         self._player_view = player_view
         self._debug_mode = debug_mode
 
-        if self._debug_mode and field!=[]:
+        if self._debug_mode and field != []:
             self._field = field
-        elif self._debug_mode and field==[]:
-            raise AttributeError("Debug mode is enabled but minefield was not provided to the UI")
-    
+        elif self._debug_mode and field == []:
+            raise AttributeError(
+                "Debug mode enabled but minefield not provided to UI")
+
     def clear(self):
         subprocess.run('cls' if os.name == 'nt' else 'clear', shell=True)
         print("\nMINESWEEPER\n")
@@ -262,7 +297,7 @@ class UI(Game):
             st = "     "
             if row == 0:
                 for col in range(self._size):
-                    st = st + "______" 
+                    st = st + "______"
                 print(st)
 
             st = "     "
@@ -277,7 +312,7 @@ class UI(Game):
                     grid = self._player_view[row][col]
                 else:
                     grid = self._field.get_tile_value(row, col)
-                
+
                 st = st + "|  " + str(grid) + "  "
             print(st + "|")
 
@@ -287,6 +322,9 @@ class UI(Game):
             print(st + '|')
 
         print()
+
+
+# FileManager - class designed for working with the file, where session history is stored
 
 class FileManager():
     def __init__(self, file_name, game):
@@ -306,8 +344,8 @@ class FileManager():
 
     def __write_data(self, f):
         f.write(f"Date: {date.today()}\n")
-        f.write(f"Elapsed time: {game.elapsed_time:.2f} s\n")
-        f.write(f"Result: {game.result}\n")
+        f.write(f"Elapsed time: {self._game.elapsed_time:.2f} s\n")
+        f.write(f"Result: {self._game.result}\n")
         f.write("\n")
         st = "   "
         for i in range(self._game.size):
@@ -317,7 +355,7 @@ class FileManager():
             st = "     "
             if row == 0:
                 for col in range(self._game.size):
-                    st = st + "______" 
+                    st = st + "______"
                 f.write(f"{st}\n")
 
             st = "     "
@@ -328,7 +366,7 @@ class FileManager():
             st = "  " + str(row + 1) + "  "
             for col in range(self._game.size):
                 grid = self._game.player_view[row][col]
-                
+
                 st = st + "|  " + str(grid) + "  "
             f.write(f"{st}|\n")
 
@@ -348,12 +386,13 @@ class FileManager():
                 self.__write_data(file)
 
 
-print("\nMINESWEEPER\n")
+if __name__ == '__main__':
+    print("\nMINESWEEPER\n")
 
-game = Game(8, False)
+    game = Game(8, False)
 
-while not game.is_over:
-    game.ui.render_ui()
-    game.player.render_ui()
-    if game.flag_count == game.size:
-        game.check_for_win(game.size)
+    while not game.is_over:
+        game.ui.render_ui()
+        game.player.render_ui()
+        if game.flag_count == game.size:
+            game.check_for_win(game.size)
