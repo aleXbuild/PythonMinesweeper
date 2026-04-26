@@ -13,29 +13,29 @@ To run the app, ensure you have Python 3 installed. Clone the repository and nav
 ### How to Use
 Once the game starts, you will be asked to select a grid size for the minefield (allowed range is given in brackets). 
 
-    ![Grid size selection](https://imgur.com/QZWalkW)
+![Grid size selection](img/1.png)
 
 By typing -1 you will enter file read mode, which will be covered later. A freshly generated minefield will appear as well as prompt for selecting a tile you want to check.
 
-    ![Generated minefield](https://imgur.com/4eGcnEF)
+![Generated minefield](img/2.png)
 
 To check a tile, type it's row and column number separated by space.
 
-    ![Selecting tile](https://imgur.com/Wc5EBv9)
+![Selecting tile](img/3.png)
 
 Selected tile revealed a number representing ammount of mines around it. If you check the tile with a mine in it, you will lose.
 
-    ![After check](https://imgur.com/YLNOCnc)
+![After check](img/4.png)
 
 In order to win the game, you have to flag all the mines in the field. In order to place a flag, select the tile as previously shown, except this time add 'F' letter. Both lowercase and uppercase work.
 
-    ![Flagging the tile](https://imgur.com/PedlOjX)
+![Flagging the tile](img/5.png)
 
 If selected tile already has a flag in it, flag will be removed.
 
 After losing or winning, you will be asked, if you want to save results of this session in a file. After agreeing by typing 'y' (once again, both lowercase and uppercase work), the information will be written to `data.txt` file. You can access this file through game's interface by typing -1 after launching the game.
 
-    ![File read mode](https://imgur.com/AJrUBmt)
+![File read mode](img/6.png)
 
 ## 2. Body/Analysis
 
