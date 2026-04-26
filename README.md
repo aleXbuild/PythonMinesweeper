@@ -39,7 +39,7 @@ After losing or winning, you will be asked, if you want to save results of this 
 
 ## 2. Body/Analysis
 
-### - 4 OOP pillars
+### 4 OOP pillars
 The program implements all 4 OOP pillars:
 
 #### 1. Polymorphism
@@ -225,14 +225,14 @@ Many class variables are marked as protected. However some variables are left to
             with open(self._file_name, "w") as file:
                 self.__write_data(file) # And here too!
 
-### - Design pattern
+### Design pattern
 This program uses **MVC (Model-View-Controller)** design pattern. I found it the most fitting for my game, since it's made of these parts. The Minefield acts as a model, UI is a view, Game and Player are controllers.
 
 + Minefield is a core of Minesweeper, therefore it's a model.
 + The role of a view is obviously claimed by UI class, since it's purpose is to display the model (a.k.a Minefield).
 + Game class has many functionalites to control the flow of the game and Player class is responsible for handling input from the player who controls the game. So both of them act as controllers.
 
-### - Composition
+### Composition
 The Game class uses significant ammount of composition. All game elements, such as Minefield, Generator, Player (input), UI and FileManager, are created within the Game class.
 
     class Game:
