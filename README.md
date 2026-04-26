@@ -35,10 +35,86 @@ After losing or winning, you will be asked, if you want to save results of this 
     ![File read mode](img/6.png)
 
 ## 2. Body/Analysis
-### Functional Requirements Implementation
-- **Grid Generation:** The game generates a grid of specified dimensions and places a set number of mines within it. This is done using random placement algorithms to ensure that the mines are distributed evenly.
-- **User Input Handling:** The application takes input from users in the form of grid coordinates, validating these inputs to prevent errors.
-- **Game Logic:** The core logic checks for mines and counts adjacent mines for each square. It uses depth-first search to reveal squares until all safe squares are uncovered.
+The program implements all 4 OOP pillars:
+
+### 1. Polymorphism
+Polymorphism is utilized for `render_ui()` method, which is abstract in Game class. Child classes Player and UI override this method to view their elements of game's UI:
+
+    # Method in Game class
+    def render_ui(self):
+        pass
+
+    ...
+
+    # Method in Player class
+    def render_ui(self):
+        try:
+            msg = "Select row and column: "
+            parts = input(msg).split()
+            self._selected_row, self._selected_col = int(
+                parts[0]), int(parts[1])
+            flag = parts[2] if len(parts) > 2 else ''
+        except (IndexError, ValueError):
+            self._game.ui.clear()
+            return
+
+        row = self._selected_row
+        col = self._selected_col
+        size = self._game.size
+        if row > 0 and col > 0 and row <= size and col <= size:
+            if flag == 'F' or flag == 'f':
+                self._game.flag_tile(row - 1, col - 1)
+            elif not flag or flag == '':
+                self._game.check_tile(row - 1, col - 1)
+
+    ...
+
+    # Method in UI class:
+    def render_ui(self):
+        print()
+        st = "   "
+        for i in range(self._size):
+            st = st + "     " + str(i + 1)
+        print(st)
+
+        for row in range(self._size):
+            st = "     "
+            if row == 0:
+                for col in range(self._size):
+                    st = st + "______"
+                print(st)
+
+            st = "     "
+            for col in range(self._size):
+                st = st + "|     "
+            print(st + "|")
+
+            st = "  " + str(row + 1) + "  "
+            for col in range(self._size):
+                grid = ''
+                if not self._debug_mode:
+                    grid = self._player_view[row][col]
+                else:
+                    grid = self._field.get_tile_value(row, col)
+
+                st = st + "|  " + str(grid) + "  "
+            print(st + "|")
+
+            st = "     "
+            for col in range(self._size):
+                st = st + "|_____"
+            print(st + '|')
+
+        print()
+
+    ...
+
+    # Execution
+    game = Game(8, False)
+
+    while not game.is_over:
+        game.ui.render_ui()
+        game.player.render_ui()
 
 ## 3. Results and Summary
 ### Results
