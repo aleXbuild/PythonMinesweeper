@@ -164,13 +164,6 @@ class TestPlayer(unittest.TestCase):
         self.player.render_ui()
         mock_flag_tile.assert_called_once_with(2, 3)
 
-    # @patch('builtins.input', return_value='invalid')
-    # @patch('minesweeper.UI.clear')
-    # def test_render_ui_invalid_input(self, mock_clear, mock_input):
-    #     self.player.render_ui()
-    #     mock_clear.assert_called_once()
-
-
 class TestUI(unittest.TestCase):
     def setUp(self):
         self.player_view = [['#' for _ in range(3)] for _ in range(3)]
